@@ -8,7 +8,7 @@ In this project, a remote controlled quadcopter capable of detecting and reactin
 
 **Hardware Abstraction:**
 
-![alt text](https://github.com/aidanmelen/object_avoidance_quadcopter/blob/master/resources/Quadcopter%20Abstract%20Sytem.jpg "Figure 1")
+![alt text](https://github.com/aidanmelen/SeniorProject/blob/master/resources/Quadcopter%20Abstract%20Sytem.jpg "Figure 1")
 
 ## Setup Local Repository
 ```
