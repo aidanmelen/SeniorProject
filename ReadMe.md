@@ -13,7 +13,7 @@ In this project, a remote controlled quadcopter capable of detecting and reactin
 ## Setup Local Repository
 ```
 git init
-git remote add origin https://github.com/aidanmelen/object_avoidance_quadcopter
+git remote add origin https://github.com/aidanmelen/SeniorProject
 git pull origin master
 ```
 
