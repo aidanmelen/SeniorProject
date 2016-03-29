@@ -23,7 +23,7 @@
 
 #define sensorDetectionDistanceInFeet 4
 boolean chooseRandomSafetyDirection = false;
-boolean serialMonitorIsOpen = true;
+boolean serialMonitorIsOpen = false;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Input Pins for Receiver
@@ -88,7 +88,7 @@ void setup() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Print RC Input Signals to Consol
+// Print RC Input Signals to Console
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void printReceiverInputToConsole() {
   Serial.print("Throttle 1: ");
