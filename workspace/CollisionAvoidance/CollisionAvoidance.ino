@@ -173,7 +173,7 @@ int runAutoPilotAndReturnClosest() {
       break;
     }
     
-    /* Update minimumDistanceThresthold */
+    /* Update minimumDistanceThresthold and resulting direction */
     if (distanceMeasurement < localMinimum) {
       localMinimum = distanceMeasurement;
       result = sensorIndex;
@@ -200,7 +200,6 @@ int runAutoPilotAndReturnClosest() {
           return randomSafeDirectionNumber;
         }
     }
-    return result;
   } else {
     return (result+2) % 4; // get opposite direction from the sensor detected i.e. shift two sensors
   }
