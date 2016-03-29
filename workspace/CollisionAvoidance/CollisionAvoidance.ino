@@ -1,26 +1,29 @@
 /*
- * avoidance_quad.ino
- *
  * Title: Collision Avoidance Algorithm
  *
  * Description:
- * This program has three major roles: 
+ * This program has three major roles:
  * first, reading RC signals from the receiver and forwarding them to the flight controller.
  * second, get distance measurements from all four ultrasonic sensors and determine the closest measurement if any.
- * third, if the closest measurement is within the acceptable threshold, instruct flight controller to perform movement in opposite direction of trigged sensor. 
+ * third, if the closest measurement is within the acceptable threshold, instruct flight controller to perform movement in opposite direction of trigged sensor.
  *
  * setup()
  * void printReceiverInputToConsole()
  * void printArduinoOutputToConsole()
- * void auxIsInAutoPilotMode()
- * void forwardRCSignalsToFlightController()
- * int getClosestDirection()
+ * boolean checkAuxForAutoPilotSignal()
+ * void forwardAuxSignal()
+ * void forwardRCSignalsToFlightControllerToFlightController()
+ * int runAutoPilotAndReturnClosest()
  * void smoothAcceleration(outputPin, currentSpeed, finalSpeed)
  * void smoothDeceleration(outputPin, currentSpeed, finalSpeed)
  * void loop()
  */
 
 #include <NewPing.h>
+
+#define sensorDetectionDistanceInFeet 4
+boolean chooseRandomSafetyDirection = false;
+boolean serialMonitorIsOpen = true;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Input Pins for Receiver
@@ -48,11 +51,6 @@
 #define s3 44 // sensor right
 #define s4 46 // sensor rear
 
-#define sensorDetectionDistanceInFeet 2
-
-boolean PRINT_INPUT_FROM_RECEIVER = false;
-boolean PRINT_OUTPUT_FROM_ARDUINO = false;
-
 // Varibles used to store and display the values of each channel
 int throttle;
 int roll;
@@ -71,7 +69,7 @@ NewPing sensors[] = {p1, p2, p3, p4};
 // Setup
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void setup() {
-  if (PRINT_INPUT_FROM_RECEIVER == true || PRINT_OUTPUT_FROM_ARDUINO == true) {
+  if (serialMonitorIsOpen == true) {
     Serial.begin(115200);
   }
   pinMode(throttleIn, INPUT);
@@ -85,37 +83,14 @@ void setup() {
   pinMode(pitchOut, OUTPUT);
   pinMode(yawOut, OUTPUT);
   pinMode(auxOut, OUTPUT);
+  
+  randomSeed(analogRead(0)); // for random safety direction
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Print RC Input Signals to Console
+// Print RC Input Signals to Consol
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void printReceiverInputToConsole() {
-  Serial.print("Throttle 1: ");
-  Serial.print(throttleOut);
-  Serial.print(" | ");
-
-  Serial.print("Channel 2:");
-  Serial.print(rollOut);
-  Serial.print(" | ");
-
-  Serial.print("Channel 3:");
-  Serial.print(pitchOut);
-  Serial.print(" | ");
-
-  Serial.print("Channel 4:");
-  Serial.print(yawOut);
-  Serial.print(" | ");
-
-  Serial.print("Aux 1: ");
-  Serial.print(auxOut);
-  Serial.println();
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Print Arudino Output Signals to Consol
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void printArduinoOutputToConsole() {
   Serial.print("Throttle 1: ");
   Serial.print(throttle);
   Serial.print(" | ");
@@ -138,20 +113,23 @@ void printArduinoOutputToConsole() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Check Aux Channel For AutoPilot Signal
+// Check Aux For AutoPilot Signal
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void auxIsInAutoPilotMode() {
+boolean checkAuxForAutoPilotSignal() {
   aux = pulseIn(auxIn, HIGH);
-  analogWrite(auxOut, map(aux, 0, 2000, 0, 255));
-  if (aux < 1500) {
-    return true;
-  else {
-    return false; 
-  }
+  if (aux > 1500) return true;
+  else return false;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Forward RC Signals to Flight Controller
+// Forward Aux Signal To The Flight Controller
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void forwardAuxSignal() {
+  analogWrite(auxOut, map(aux, 0, 2000, 0, 255));
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// Forward RC Signals To Flight Controller
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void forwardRCSignalsToFlightController() {
   throttle = pulseIn(throttleIn, HIGH);
@@ -164,32 +142,68 @@ void forwardRCSignalsToFlightController() {
   analogWrite(pitchOut, map(pitch, 0, 2000, 0, 255));
   analogWrite(yawOut, map(yaw, 0, 2000, 0, 255));
 
-  if (PRINT_INPUT_FROM_RECEIVER == true) {
-    printReceiverInputToConsole();
-  }
-  if (PRINT_OUTPUT_FROM_ARDUINO == true) {
-    printArduinoOutputToConsole();
-  }
+  if (serialMonitorIsOpen) printReceiverInputToConsole();
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Return ping sensor with closest result
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int getClosestDirection() {
-  unsigned long distance;
-  int minimum = sensorDetectionDistanceInFeet * 12; // convert to ft
+int runAutoPilotAndReturnClosest() {
+  int minimumDistanceThresthold = sensorDetectionDistanceInFeet * 12; // convert to ft
+  unsigned long distanceMeasurement;
+  int localMinimum = 10000000;
+  int randomSafeDirectionNumber;
   int result = -1;
 
-  // it takes one seconds to get complete a measurement cycle
-  for (int i = 0; i < 4; i++) {
-    distance = sensors[i].ping_median(7) / US_ROUNDTRIP_IN; // calculate median distance a burst of 7 sonar pings
+  int sensorIndex = 0;
+  while (true) {
+    
+    /*  Get the median measurement from a bursts of five pings */
+    distanceMeasurement = sensors[sensorIndex].ping_median(5) / US_ROUNDTRIP_IN;
 
-    if (distance < minimum && distance != 0) {
-      minimum = distance;
-      result = i;
+    /* Check if distanceMeasurement is out of range and therefore throwaway */
+    if (distanceMeasurement == 0) {
+      if (serialMonitorIsOpen) Serial.println(sensorIndex + " - Out Of Range");
+      continue;
     }
+
+    /* Failsafe mechanism for exiting autopilot */
+    if (!checkAuxForAutoPilotSignal()) {
+      if (serialMonitorIsOpen) Serial.println("Break out of closest");
+      break;
+    }
+    
+    /* Update minimumDistanceThresthold */
+    if (distanceMeasurement < localMinimum) {
+      localMinimum = distanceMeasurement;
+      result = sensorIndex;
+    }
+    
+    /* Increment sensor index or recycle index back to 0 and reset localMinimum to a big number*/
+    if (sensorIndex == 4) {
+      if (localMinimum < minimumDistanceThresthold) break;
+      localMinimum = 10000000;
+      sensorIndex = 0;
+      result = -1;
+    } else {
+      sensorIndex++;
+    }
+    
+    forwardRCSignalsToFlightController();
   }
-  return result;
+  
+  if (chooseRandomSafetyDirection) {
+    while (true) {
+      randomSafeDirectionNumber = random(0, 4);
+        if (randomSafeDirectionNumber != result) {
+          if (serialMonitorIsOpen) Serial.println(randomSafeDirectionNumber);
+          return randomSafeDirectionNumber;
+        }
+    }
+    return result;
+  } else {
+    return (result+2) % 4; // get opposite direction from the sensor detected i.e. shift two sensors
+  }
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -202,7 +216,7 @@ void smoothAcceleration(int outputPin, int currentSpeed, int finalSpeed) {
     delayMicroseconds(500);
   }
 
-  delay(1500);
+  delay(500);
 
   for (int i = finalSpeed; i > currentSpeed; i--) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
@@ -220,7 +234,7 @@ void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
     delayMicroseconds(500);
   }
 
-  delay(1500);
+  delay(500);
 
   for (int i = finalSpeed; i < currentSpeed; i++) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
@@ -232,24 +246,26 @@ void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
 // Main Loop
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void loop() {
-  if (auxIsInAutoPilotMode()) {
-    int closest = getClosestDirection();
+  if (checkAuxForAutoPilotSignal()) {
+    int closest = runAutoPilotAndReturnClosest();
     switch (closest) {
       case 0:
-        smoothDeceleration(rollOut, roll, 1350); // move right
-        break;
-      case 1:
-        smoothDeceleration(pitchOut, pitch, 1350); // move backward
-        break;
-      case 2:
         smoothAcceleration(rollOut, roll, 1650); // move left
         break;
-      case 3:
+      case 1:
         smoothAcceleration(pitchOut, pitch, 1650); // move forward
         break;
+      case 2:
+        smoothDeceleration(rollOut, roll, 1350); // move right
+        break;
+      case 3:
+        smoothDeceleration(pitchOut, pitch, 1350); // move backward
+        break;
+      default:
+        break;
     }
+    forwardAuxSignal();
   } else {
     forwardRCSignalsToFlightController();
   }
 }
-
