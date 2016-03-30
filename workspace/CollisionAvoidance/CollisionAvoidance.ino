@@ -6,21 +6,14 @@
  * first, reading RC signals from the receiver and forwarding them to the flight controller.
  * second, get distance measurements from all four ultrasonic sensors and determine the closest measurement if any.
  * third, if the closest measurement is within the acceptable threshold, instruct flight controller to perform movement in opposite direction of trigged sensor.
- *
- * setup()
- * void printReceiverInputToConsole()
- * void printArduinoOutputToConsole()
- * boolean isAutoPilotMode()
- * void forwardAuxSignal()
- * void forwardRCSignalsToFlightControllerToFlightController()
- * int runAutoPilotAndReturnClosest()
- * void smoothAcceleration(outputPin, currentSpeed, finalSpeed)
- * void smoothDeceleration(outputPin, currentSpeed, finalSpeed)
- * void loop()
  */
 
 #include <NewPing.h>
 
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// Configuration Variables
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 150
 #define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 10
 #define MAX_PING_DISTANCE_IN_CM 200
@@ -131,6 +124,9 @@ void printSonarMeasurementsToConsole(int sensorIndex, int distanceMeasurement) {
   Serial.print("  --  ");
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// Print Final Avoidance Directon
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void printFinalAvoidanceDirecton(int avoidanceDirection) {
   if (avoidanceDirection == 0) {
     Serial.println();
@@ -188,24 +184,24 @@ void forwardRCSignalsToFlightController() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Run Auto Pilot Loop: determine sensor with closest measurement
+// Run Auto Pilot Loop: Determine Sensor With Closest Measurement And Preform Collision Avoidance Manuever
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int runAutoPilot() {
   unsigned long finalDistanceMeasurement;
   int potentialAvoidanceDirecton;
   while (true) {
     potentialAvoidanceDirecton = getClosestDirection();
-    
     if (potentialAvoidanceDirecton != -1) {
-      /* double check measurement */
       finalDistanceMeasurement = sensorArray[potentialAvoidanceDirecton].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
-      /* perform collison avoidance maneuver */
-      if (distanceMeasurementIsInRange(finalDistanceMeasurement)) forwardCollisionAvoidanceManeuverToFlightController((potentialAvoidanceDirecton + 2) % 4);
+      if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) forwardCollisionAvoidanceManeuverToFlightController((potentialAvoidanceDirecton + 2) % 4);
     }
     if (!isAutoPilotMode()) break;
   }
 }
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// Get The Direction With The First Sensor That Is Closer Than OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int getClosestDirection() {
   unsigned long initialDistanceMeasurement;
   int potentialAvoidanceDirecton = -1;
@@ -214,16 +210,16 @@ int getClosestDirection() {
     initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM;
     forwardRCSignalsToFlightController();
 
-    if (distanceMeasurementIsInRange(initialDistanceMeasurement)) potentialAvoidanceDirecton = sensorIndex;
+    if (distanceMeasurementIsWithinRange(initialDistanceMeasurement)) potentialAvoidanceDirecton = sensorIndex;
     if (!isAutoPilotMode()) break;
   }
   return potentialAvoidanceDirecton;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Check If Distance Measurement is in the target Range
+// Check If Distance Measurement is Within The Target Range
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-boolean distanceMeasurementIsInRange(int distanceMeasurement) {
+boolean distanceMeasurementIsWithinRange(int distanceMeasurement) {
   if (distanceMeasurement < OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM && distanceMeasurement > INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM && distanceMeasurement != 0) return true;
   else return false;
 }
