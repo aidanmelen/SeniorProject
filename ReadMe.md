@@ -1,4 +1,4 @@
-# Westminster College Senior Research Project: Object Avoidance Quadcopter
+# Westminster College Senior Research Project: Collision Avoidance Quadcopter
 
 **Author:** Aidan Melen
 
