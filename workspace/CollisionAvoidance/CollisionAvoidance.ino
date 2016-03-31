@@ -14,9 +14,9 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Configuration Variables
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 150
+#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 400
 #define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 10
-#define MAX_PING_DISTANCE_IN_CM 200
+#define MAX_PING_DISTANCE_IN_CM 500
 #define NUMBER_OF_SONAR_BURSTS 10
 #define MAX_AUTOPILOT_MOVEMENT 100
 
@@ -69,9 +69,9 @@ NewPing sensorArray[] = {p1, p2, p3, p4};
 // Setup
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void setup() {
-  //  if (serialMonitorIsOpen == true) {
-  Serial.begin(115200);
-  //  }
+  if (serialMonitorIsOpen == true) {
+    Serial.begin(115200);
+  }
   pinMode(throttleIn, INPUT);
   pinMode(rollIn, INPUT);
   pinMode(pitchIn, INPUT);
@@ -205,7 +205,7 @@ int runAutoPilot() {
 int getClosestDirection() {
   unsigned long initialDistanceMeasurement;
   int potentialAvoidanceDirecton = -1;
-  for (int sensorIndex = 0; sensorIndex < 4; sensorIndex++)  {
+  for (int sensorIndex = 0; sensorIndex < ((int)sizeof(sensorArray)/sizeof(NewPing)); sensorIndex++)  {
     forwardRCSignalsToFlightController();
     initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM;
     forwardRCSignalsToFlightController();
