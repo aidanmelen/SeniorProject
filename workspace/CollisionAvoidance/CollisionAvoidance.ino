@@ -14,11 +14,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Configuration Variables
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 400
+#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 200
 #define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 10
-#define MAX_PING_DISTANCE_IN_CM 500
 #define NUMBER_OF_SONAR_BURSTS 10
-#define MAX_AUTOPILOT_MOVEMENT 100
+#define MAX_AUTOPILOT_MOVEMENT 200
+#define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 500
 
 boolean chooseRandomSafetyDirection = false;
 boolean serialMonitorIsOpen = false;
@@ -58,20 +58,20 @@ int aux;
 #define s3 44 // sensor right
 #define s4 46 // sensor rear
 
-// Create NewPing objects for each sensor
-NewPing p1(s1, s1, 200); // pins share the same for both trig and echo
-NewPing p2(s2, s2, 200);
-NewPing p3(s3, s3, 200);
-NewPing p4(s4, s4, 200);
+// Create NewPing objects for each sensor where sensors share the same pin for both trig and echo. The third argument is timeout.
+NewPing p1(s1, s1, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);.
+NewPing p2(s2, s2, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
+NewPing p3(s3, s3, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
+NewPing p4(s4, s4, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
 NewPing sensorArray[] = {p1, p2, p3, p4};
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Setup
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void setup() {
-  if (serialMonitorIsOpen == true) {
-    Serial.begin(115200);
-  }
+  //  if (serialMonitorIsOpen == true) {
+  Serial.begin(115200);
+  //  }
   pinMode(throttleIn, INPUT);
   pinMode(rollIn, INPUT);
   pinMode(pitchIn, INPUT);
@@ -205,7 +205,7 @@ int runAutoPilot() {
 int getClosestDirection() {
   unsigned long initialDistanceMeasurement;
   int potentialAvoidanceDirecton = -1;
-  for (int sensorIndex = 0; sensorIndex < ((int)sizeof(sensorArray)/sizeof(NewPing)); sensorIndex++)  {
+  for (int sensorIndex = 0; sensorIndex < 4; sensorIndex++)  {
     forwardRCSignalsToFlightController();
     initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM;
     forwardRCSignalsToFlightController();
@@ -258,13 +258,15 @@ void smoothAcceleration(int outputPin, int currentSpeed, int finalSpeed) {
   for (int i = currentSpeed; i < finalSpeed; i++) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
+    if (!isAutoPilotMode()) break;
   }
 
-  delay(500);
+  if (isAutoPilotMode()) delay(AUTOPILOT_MOVEMENT_DURATION_IN_MILLI);
 
   for (int i = finalSpeed; i > currentSpeed; i--) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
+    if (!isAutoPilotMode()) break;
   }
 }
 
@@ -276,13 +278,15 @@ void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
   for (int i = currentSpeed; i > finalSpeed; i--) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
+    if (!isAutoPilotMode()) break;
   }
 
-  delay(500);
+  if (isAutoPilotMode()) delay(AUTOPILOT_MOVEMENT_DURATION_IN_MILLI);
 
   for (int i = finalSpeed; i < currentSpeed; i++) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
+    if (!isAutoPilotMode()) break;
   }
 }
 
@@ -296,4 +300,5 @@ void loop() {
     forwardRCSignalsToFlightController();
   }
 }
+
 
