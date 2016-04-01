@@ -10,17 +10,16 @@
 
 #include <NewPing.h>
 
-
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Configuration Variables
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 200
 #define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 10
 #define NUMBER_OF_SONAR_BURSTS 10
-#define MAX_AUTOPILOT_MOVEMENT 200
+#define MAX_AUTOPILOT_MOVEMENT 300
 #define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 500
 
-boolean preformSmartSafetyManeuver = false;
+boolean preformMarkovAvoidance = false;
 boolean serialMonitorIsOpen = false;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -193,11 +192,11 @@ int runAutoPilot() {
     incomingCollisionDirecton = getClosestDirection();
     if (incomingCollisionDirecton != -1) {
       if (distanceMeasurementIsWithinRange(getDistanceMeasurement(incomingCollisionDirecton))) {
-        if (preformSmartSafetyManeuver) {
+        if (preformMarkovAvoidance) {
           forwardCollisionAvoidanceManeuverToFlightController(getMarkovCollisionAvoidance(incomingCollisionDirecton));
         } else {
-          /* if the direction opposite of the incomingCollisionDirecton is safe, move that direction*/
-          if (distanceMeasurementIsWithinRange(getDistanceMeasurement((incomingCollisionDirecton + 2) % 4))) forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); 
+          /* simply move in the opposite direction*/
+          forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); 
         }
       }
     }
@@ -298,7 +297,6 @@ void smoothAcceleration(int outputPin, int currentSpeed, int finalSpeed) {
   for (int i = currentSpeed; i < finalSpeed; i++) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
-    if (!isAutoPilotMode()) break;
   }
 
   if (isAutoPilotMode()) delay(AUTOPILOT_MOVEMENT_DURATION_IN_MILLI);
@@ -306,7 +304,6 @@ void smoothAcceleration(int outputPin, int currentSpeed, int finalSpeed) {
   for (int i = finalSpeed; i > currentSpeed; i--) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
-    if (!isAutoPilotMode()) break;
   }
 }
 
@@ -318,7 +315,6 @@ void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
   for (int i = currentSpeed; i > finalSpeed; i--) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
-    if (!isAutoPilotMode()) break;
   }
 
   if (isAutoPilotMode()) delay(AUTOPILOT_MOVEMENT_DURATION_IN_MILLI);
@@ -326,7 +322,6 @@ void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
   for (int i = finalSpeed; i < currentSpeed; i++) {
     analogWrite(outputPin, map(i, 0, 2000, 0, 255));
     delayMicroseconds(500);
-    if (!isAutoPilotMode()) break;
   }
 }
 
