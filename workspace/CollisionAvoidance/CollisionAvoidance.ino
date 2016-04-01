@@ -192,10 +192,13 @@ int runAutoPilot() {
   while (true) {
     incomingCollisionDirecton = getClosestDirection();
     if (incomingCollisionDirecton != -1) {
-      finalDistanceMeasurement = sensorArray[incomingCollisionDirecton].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
-      if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) {
-        if (preformSmartSafetyManeuver) forwardCollisionAvoidanceManeuverToFlightController(getMarkovCollisionAvoidance(incomingCollisionDirecton));
-        else forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); // simply move in opposite direction
+      if (distanceMeasurementIsWithinRange(getDistanceMeasurement(incomingCollisionDirecton))) {
+        if (preformSmartSafetyManeuver) {
+          forwardCollisionAvoidanceManeuverToFlightController(getMarkovCollisionAvoidance(incomingCollisionDirecton));
+        } else {
+          /* if the direction opposite of the incomingCollisionDirecton is safe, move that direction*/
+          if (distanceMeasurementIsWithinRange(getDistanceMeasurement((incomingCollisionDirecton + 2) % 4))) forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); 
+        }
       }
     }
     if (!isAutoPilotMode()) break;
@@ -219,6 +222,10 @@ int getClosestDirection() {
   return incomingCollisionDirecton;
 }
 
+unsigned long getDistanceMeasurement(int directionToTest) {
+  return sensorArray[directionToTest].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
+}
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Check If Distance Measurement is Within The Target Range
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -232,20 +239,29 @@ boolean distanceMeasurementIsWithinRange(int distanceMeasurement) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int getMarkovCollisionAvoidance(int incomingCollisionDirecton) {
   int randomSafeDirectionNumber;
-  int potentialAvoidanceDirecton;
+  int oppositeDirection = (incomingCollisionDirecton + 2) % 4;
+  int leftDirection = (incomingCollisionDirecton + 1) % 4;
+  int rightDirection = (incomingCollisionDirecton + 3) % 4;
+  
   randomSafeDirectionNumber = random(0, 9);
   
   if (serialMonitorIsOpen) Serial.println(randomSafeDirectionNumber);
 
   /* Give 80% chance of avoiding in the opposite direction */
-  if (randomSafeDirectionNumber < 7) return (incomingCollisionDirecton + 2) % 4;
+  if (randomSafeDirectionNumber < 7) {
+    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(oppositeDirection))) return oppositeDirection;
+  }
 
   /* Give 10% chance of avoiding in the left direction */
-  if (randomSafeDirectionNumber == 8) return (incomingCollisionDirecton + 1) % 4;
+  if (randomSafeDirectionNumber == 8) {
+    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(leftDirection))) return leftDirection; 
+  }
 
   /* Give 10% chance of avoiding in the right direction */
-  if (randomSafeDirectionNumber < 9) return (incomingCollisionDirecton + 3) % 4;
-  return (incomingCollisionDirecton + 2) % 4;
+  if (randomSafeDirectionNumber == 9) {
+    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(rightDirection))) return rightDirection;  
+  }
+  return (incomingCollisionDirecton + 2) % 4; // default to opposite direction
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
