@@ -20,7 +20,7 @@
 #define MAX_AUTOPILOT_MOVEMENT 200
 #define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 500
 
-boolean chooseRandomSafetyDirection = false;
+boolean preformSmartSafetyManeuver = false;
 boolean serialMonitorIsOpen = false;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -59,7 +59,7 @@ int aux;
 #define s4 46 // sensor rear
 
 // Create NewPing objects for each sensor where sensors share the same pin for both trig and echo. The third argument is timeout.
-NewPing p1(s1, s1, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);.
+NewPing p1(s1, s1, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
 NewPing p2(s2, s2, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
 NewPing p3(s3, s3, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
 NewPing p4(s4, s4, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
@@ -84,7 +84,7 @@ void setup() {
   pinMode(yawOut, OUTPUT);
   pinMode(auxOut, OUTPUT);
 
-  //  randomSeed(analogRead(0)); // for random safety direction
+  randomSeed(analogRead(0)); // for random safety direction
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -130,23 +130,23 @@ void printSonarMeasurementsToConsole(int sensorIndex, int distanceMeasurement) {
 void printFinalAvoidanceDirecton(int avoidanceDirection) {
   if (avoidanceDirection == 0) {
     Serial.println();
-    Serial.println("Avoidance Movement Left");
+    Serial.println("Collision Avoidance Maneuver Left");
     Serial.println();
   }
   if (avoidanceDirection == 0) {
     Serial.println();
-    Serial.println("Avoidance Movement Front");
-    Serial.println();  
+    Serial.println("Collision Avoidance Maneuver Front");
+    Serial.println();
   }
   if (avoidanceDirection == 0) {
     Serial.println();
-    Serial.println("Avoidance Movement To Right");
-    Serial.println();    
+    Serial.println("Collision Avoidance Maneuver To Right");
+    Serial.println();
   }
   if (avoidanceDirection == 0) {
     Serial.println();
-    Serial.println("Avoidance Movement To Backwards");
-    Serial.println();    
+    Serial.println("Collision Avoidance Maneuver To Backwards");
+    Serial.println();
   }
 }
 
@@ -188,12 +188,15 @@ void forwardRCSignalsToFlightController() {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int runAutoPilot() {
   unsigned long finalDistanceMeasurement;
-  int potentialAvoidanceDirecton;
+  int incomingCollisionDirecton;
   while (true) {
-    potentialAvoidanceDirecton = getClosestDirection();
-    if (potentialAvoidanceDirecton != -1) {
-      finalDistanceMeasurement = sensorArray[potentialAvoidanceDirecton].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
-      if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) forwardCollisionAvoidanceManeuverToFlightController((potentialAvoidanceDirecton + 2) % 4);
+    incomingCollisionDirecton = getClosestDirection();
+    if (incomingCollisionDirecton != -1) {
+      finalDistanceMeasurement = sensorArray[incomingCollisionDirecton].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
+      if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) {
+        if (preformSmartSafetyManeuver) forwardCollisionAvoidanceManeuverToFlightController(getMarkovCollisionAvoidance(incomingCollisionDirecton));
+        else forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); // simply move in opposite direction
+      }
     }
     if (!isAutoPilotMode()) break;
   }
@@ -204,16 +207,16 @@ int runAutoPilot() {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int getClosestDirection() {
   unsigned long initialDistanceMeasurement;
-  int potentialAvoidanceDirecton = -1;
+  int incomingCollisionDirecton = -1;
   for (int sensorIndex = 0; sensorIndex < 4; sensorIndex++)  {
     forwardRCSignalsToFlightController();
     initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM;
     forwardRCSignalsToFlightController();
 
-    if (distanceMeasurementIsWithinRange(initialDistanceMeasurement)) potentialAvoidanceDirecton = sensorIndex;
+    if (distanceMeasurementIsWithinRange(initialDistanceMeasurement)) incomingCollisionDirecton = sensorIndex;
     if (!isAutoPilotMode()) break;
   }
-  return potentialAvoidanceDirecton;
+  return incomingCollisionDirecton;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -222,6 +225,27 @@ int getClosestDirection() {
 boolean distanceMeasurementIsWithinRange(int distanceMeasurement) {
   if (distanceMeasurement < OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM && distanceMeasurement > INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM && distanceMeasurement != 0) return true;
   else return false;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// Markov Collision Avoidance
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+int getMarkovCollisionAvoidance(int incomingCollisionDirecton) {
+  int randomSafeDirectionNumber;
+  int potentialAvoidanceDirecton;
+  randomSafeDirectionNumber = random(0, 9);
+  
+  if (serialMonitorIsOpen) Serial.println(randomSafeDirectionNumber);
+
+  /* Give 80% chance of avoiding in the opposite direction */
+  if (randomSafeDirectionNumber < 7) return (incomingCollisionDirecton + 2) % 4;
+
+  /* Give 10% chance of avoiding in the left direction */
+  if (randomSafeDirectionNumber == 8) return (incomingCollisionDirecton + 1) % 4;
+
+  /* Give 10% chance of avoiding in the right direction */
+  if (randomSafeDirectionNumber < 9) return (incomingCollisionDirecton + 3) % 4;
+  return (incomingCollisionDirecton + 2) % 4;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
