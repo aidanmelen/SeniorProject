@@ -13,8 +13,8 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Configuration variables
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 150
-#define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 50
+#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 50
+#define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 150
 #define NUMBER_OF_SONAR_BURSTS 10
 #define MAX_AUTOPILOT_MOVEMENT 200
 #define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 500
@@ -211,8 +211,12 @@ int runAutoPilot() {
     // a sensor was triggered by closest()
     if (incomingCollisionDirecton != -1) {
 
-      if (preformMarkovAvoidance) forwardCollisionAvoidanceManeuverToFlightController(getMarkovCollisionAvoidance(incomingCollisionDirecton));  
-      else forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); // avoid collision with movement in opposite direction
+      if (preformMarkovAvoidance) {
+        int markovDirection = getMarkovCollisionAvoidance(incomingCollisionDirecton);
+        forwardCollisionAvoidanceManeuverToFlightController(markovDirection);  
+      } else {
+        forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); // avoid collision with movement in opposite direction
+      }
     }
 
     if (!isAutoPilotMode()) break;
@@ -249,7 +253,8 @@ int getClosestDirection() {
       if (!isAutoPilotMode()) break;
       if (!serialMonitorIsOpen)forwardRCSignalsToFlightController();
 
-      // if it passes, it was not a false-positive measurement
+      // if it passes, it was not a false-positive measurement.
+      // proceed to mark the direction as triggered.
       if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) {
         incomingCollisionDirecton = sensorIndex;
         break;
@@ -290,25 +295,24 @@ int getMarkovCollisionAvoidance(int incomingCollisionDirecton) {
   int relativeLeftDirection = (incomingCollisionDirecton + 1) % 4;
   int relativateRightDirection = (incomingCollisionDirecton + 3) % 4;
 
-  randomSafeDirectionNumber = random(0, 9);
+  randomSafeDirectionNumber = random(0, 10); // 10 is exclusive
 
   if (serialMonitorIsOpen) Serial.println(randomSafeDirectionNumber);
-
-  /* Give 80% chance of avoiding in the opposite direction */
-  if (randomSafeDirectionNumber < 7) {
-    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(oppositeDirection))) return oppositeDirection;
+  
+  /* Give 60% chance of avoiding in the opposite direction */
+  if (randomSafeDirectionNumber <= 5) {
+    if (!distanceMeasurementIsWithinRange(getDistanceMeasurement(oppositeDirection))) return oppositeDirection;
+  }
+  
+  /* Give 20% chance of avoiding in the relative left direction */
+  if (randomSafeDirectionNumber == 6 || randomSafeDirectionNumber == 7) {
+    if (!distanceMeasurementIsWithinRange(getDistanceMeasurement(relativeLeftDirection))) return relativeLeftDirection;
   }
 
-  /* Give 10% chance of avoiding in the relative left direction */
-  if (randomSafeDirectionNumber == 8) {
-    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(relativeLeftDirection))) return relativeLeftDirection;
+  /* Give 20% chance of avoiding in the relative right direction */
+  if (randomSafeDirectionNumber == 8 || randomSafeDirectionNumber == 9) {
+    if (!distanceMeasurementIsWithinRange(getDistanceMeasurement(relativateRightDirection))) return relativateRightDirection;
   }
-
-  /* Give 10% chance of avoiding in the relative right direction */
-  if (randomSafeDirectionNumber == 9) {
-    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(relativateRightDirection))) return relativateRightDirection;
-  }
-  return (incomingCollisionDirecton + 2) % 4; // default to opposite direction
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
