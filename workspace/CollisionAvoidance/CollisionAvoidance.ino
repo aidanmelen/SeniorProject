@@ -11,19 +11,19 @@
 #include <NewPing.h>
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Configuration Variables
+// Configuration variables
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 300
+#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 150
 #define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 50
 #define NUMBER_OF_SONAR_BURSTS 10
 #define MAX_AUTOPILOT_MOVEMENT 200
 #define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 500
 
 boolean const preformMarkovAvoidance = false;
-boolean const serialMonitorIsOpen = true;
+boolean const serialMonitorIsOpen = false;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Input Pins for Receiver
+// Input pins for receiver
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define throttleIn 2
 #define rollIn 3
@@ -32,7 +32,7 @@ boolean const serialMonitorIsOpen = true;
 #define auxIn 6
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Output Pins for Naza-M V2
+// Output pins for Naza-M V2
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define throttleOut 8
 #define rollOut 9
@@ -58,14 +58,14 @@ int aux;
 #define s4 46 // sensor rear
 
 // Create NewPing objects for each sensor where sensors share the same pin for both trig and echo. The third argument is timeout.
-NewPing p1(s1, s1, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
-NewPing p2(s2, s2, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
-NewPing p3(s3, s3, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
-NewPing p4(s4, s4, OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM);
+NewPing p1(s1, s1, 200);
+NewPing p2(s2, s2, 200);
+NewPing p3(s3, s3, 200);
+NewPing p4(s4, s4, 200);
 NewPing sensorArray[] = {p1, p2, p3, p4};
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Setup
+// Setup Pins for RC i/o and utrasonic sensor inputs
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void setup() {
   //  if (serialMonitorIsOpen == true) {
@@ -87,7 +87,7 @@ void setup() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Print RC Input Signals to Console
+// Print RC input signals to console
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void printReceiverInputToConsole() {
   Serial.print("Throttle 1: ");
@@ -112,10 +112,10 @@ void printReceiverInputToConsole() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Print Sonar Measurements to Console
+// Print sonar measurements to console
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void printSonarMeasurementsToConsole(int sensorIndex, int distanceMeasurement) {
-  if (sensorIndex == 0){
+  if (sensorIndex == 0) {
     Serial.print("Left: ");
     Serial.print(sensorIndex);
   }
@@ -137,7 +137,7 @@ void printSonarMeasurementsToConsole(int sensorIndex, int distanceMeasurement) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Print Final Avoidance Directon
+// Print final avoidance directon
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void printFinalAvoidanceDirecton(int avoidanceDirection) {
   if (avoidanceDirection == 0) {
@@ -163,7 +163,7 @@ void printFinalAvoidanceDirecton(int avoidanceDirection) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Check Aux For AutoPilot Signal
+// Check the Aux for AutoPilot signal
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 boolean isAutoPilotMode() {
   aux = pulseIn(auxIn, HIGH);
@@ -172,14 +172,14 @@ boolean isAutoPilotMode() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Forward Aux Signal To The Flight Controller
+// Forward the aux signal to the Flight Controller
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void forwardAuxSignal() {
   analogWrite(auxOut, map(aux, 0, 2000, 0, 255));
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Forward RC Signals To Flight Controller
+// Forward the RC signals to the Flight Controller
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void forwardRCSignalsToFlightController() {
   throttle = pulseIn(throttleIn, HIGH);
@@ -196,72 +196,78 @@ void forwardRCSignalsToFlightController() {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Run Auto Pilot Loop: Determine Sensor With Closest Measurement And Preform Collision Avoidance Manuever
+// Run auto pilot loop: determine the sensor with the closest measurement 
+// and forward collision avoidance manuever to the flight controller to preform.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int runAutoPilot() {
   int incomingCollisionDirecton = -1;
   while (true) {
-    
+
+    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
     // check sensors for triggering distances
     incomingCollisionDirecton = getClosestDirection();
-    
+    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
+
     // a sensor was triggered by closest()
-//    if (incomingCollisionDirecton <= 3 && incomingCollisionDirecton >= 0) {
     if (incomingCollisionDirecton != -1) {
-       
-      // avoid collision with movement in opposite direction
-      forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4);
+
+      if (preformMarkovAvoidance) forwardCollisionAvoidanceManeuverToFlightController(getMarkovCollisionAvoidance(incomingCollisionDirecton));  
+      else forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); // avoid collision with movement in opposite direction
     }
-    
+
     if (!isAutoPilotMode()) break;
-    
+
   } // end of while
-  
+
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Get The Direction With The First Sensor That Is Closer Than OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM
+// Get the direction with the first sensor that is closer than OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int getClosestDirection() {
   int initialDistanceMeasurement;
   int finalDistanceMeasurement;
   int incomingCollisionDirecton = -1;
-  
+
   for (int sensorIndex = 0; sensorIndex <= 3; sensorIndex++)  {
-    
+
     // get distance measurement quickly with one ping
     initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM;
-    
+
     // print out distance measurement
     if (serialMonitorIsOpen) printSonarMeasurementsToConsole(sensorIndex, initialDistanceMeasurement);
-    
+
     // check and exit if triggered
     if (distanceMeasurementIsWithinRange(initialDistanceMeasurement)) {
-      
-       if (serialMonitorIsOpen) delay(2000);
-      
+
+      if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
+      if (!isAutoPilotMode()) break;
+
+      if (!serialMonitorIsOpen)forwardRCSignalsToFlightController();
       // double check with with multiple pings
       finalDistanceMeasurement = sensorArray[sensorIndex].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
-      
+      if (!isAutoPilotMode()) break;
+      if (!serialMonitorIsOpen)forwardRCSignalsToFlightController();
+
       // if it passes, it was not a false-positive measurement
       if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) {
         incomingCollisionDirecton = sensorIndex;
         break;
-        
+
       }  // end final check
     } // end initial check
-    
+
     if (!isAutoPilotMode()) break;
-    
+
   } // end of for
-  
+
   if (serialMonitorIsOpen) Serial.println();
-  
+
   return incomingCollisionDirecton;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Check If Distance Measurement is Within The Target Range
+// Check if distance measurement is within the target range.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 boolean distanceMeasurementIsWithinRange(int distanceMeasurement) {
   if (distanceMeasurement < OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM && distanceMeasurement > INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM && distanceMeasurement != 0) return true;
@@ -269,16 +275,23 @@ boolean distanceMeasurementIsWithinRange(int distanceMeasurement) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Markov Collision Avoidance
+// Get distance measurement from a giving direction
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+int getDistanceMeasurement(int incomingDirection) {
+  return sensorArray[incomingDirection].ping() / US_ROUNDTRIP_CM;
+}
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+// Markov collision avoidance algorithm.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 int getMarkovCollisionAvoidance(int incomingCollisionDirecton) {
   int randomSafeDirectionNumber;
   int oppositeDirection = (incomingCollisionDirecton + 2) % 4;
   int relativeLeftDirection = (incomingCollisionDirecton + 1) % 4;
   int relativateRightDirection = (incomingCollisionDirecton + 3) % 4;
-  
+
   randomSafeDirectionNumber = random(0, 9);
-  
+
   if (serialMonitorIsOpen) Serial.println(randomSafeDirectionNumber);
 
   /* Give 80% chance of avoiding in the opposite direction */
@@ -288,19 +301,18 @@ int getMarkovCollisionAvoidance(int incomingCollisionDirecton) {
 
   /* Give 10% chance of avoiding in the relative left direction */
   if (randomSafeDirectionNumber == 8) {
-    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(relativeLeftDirection))) return relativeLeftDirection; 
+    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(relativeLeftDirection))) return relativeLeftDirection;
   }
 
   /* Give 10% chance of avoiding in the relative right direction */
   if (randomSafeDirectionNumber == 9) {
-    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(relativateRightDirection))) return relativateRightDirection;  
+    if (distanceMeasurementIsWithinRange(getDistanceMeasurement(relativateRightDirection))) return relativateRightDirection;
   }
-  
   return (incomingCollisionDirecton + 2) % 4; // default to opposite direction
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Forward Collision Avoidance Movement To The Flight Controler
+// Forward collision avoidance manuever to the Flight Controler
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void forwardCollisionAvoidanceManeuverToFlightController(int avoidanceDirection) {
   switch (avoidanceDirection) {
@@ -326,7 +338,7 @@ void forwardCollisionAvoidanceManeuverToFlightController(int avoidanceDirection)
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Smooth Acceleration
+// Smooth acceleration
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void smoothAcceleration(int outputPin, int currentSpeed, int finalSpeed) {
   boolean flag = true;
@@ -344,7 +356,7 @@ void smoothAcceleration(int outputPin, int currentSpeed, int finalSpeed) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Smooth Deceleration
+// Smooth deceleration
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
   boolean flag = true;
@@ -362,7 +374,7 @@ void smoothDeceleration(int outputPin, int currentSpeed, int finalSpeed) {
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-// Main Loop
+// Main loop
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void loop() {
   if (isAutoPilotMode()) {
