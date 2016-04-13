@@ -1,3 +1,6 @@
+## Resumé - 2016
+* [Link to Resumé](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/resume%20-%202016/Aidan%20Melen.pdf)
+
 ## Computer Graphics - Ray Tracer
 * [Code On GitHub](https://github.com/aidanmelen/computer_graphics)
 
