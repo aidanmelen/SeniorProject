@@ -37,10 +37,8 @@ Since this project was setup in groups of four, it was necessary for me to share
 More specifically, our group had difficulties learning and using GitHub which resulted in many catastrophic merge-conflicts. In fact, our entire database was deleted and entire blocks of code were erased. It was during this time that I realized the true importance of a version control system. I learned that one could simply reset the head of the project back to a state where the project worked thus simply avoiding a catastrophe. I had modest experience with git and mercurial before this course; however, I had never needed to salvage a broken remote repository shared among four programmers. This was a new challenge for me which required problem solving, but also communication with my group members.
 
 
-##IOS Application Development - Drinking Lab
+##IOS Application Development - Drinking Lab <img src="https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/ios-development/Drinking%20Lab%20-%20iPal.png" width="48">
 * [Link to Apple's App Store](https://itunes.apple.com/us/app/drinking-lab-lite/id916412823?mt=8)
-
-![image 6](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/ios-development/Drinking%20Lab%20-%20iPal.png)
 
 ![image 7](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/ios-development/Drinking%20Lab%20PRO.png)
 
