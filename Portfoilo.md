@@ -15,9 +15,10 @@ In retrospect, I learned that python wasn’t the best language choice for build
 * [Link to Inscrutable Page](http://www.instructables.com/id/PIR-Motion-Sensor-Box/)
 * [Link To Video Demonstration](https://vimeo.com/131317907)
 
-![image 3](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/embedded-systems/IMG_2316.jpg)
+<img src="https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/embedded-systems/IMG_2316.jpg" width="400"> <img src="https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/embedded-systems/Untitled%20Sketch_bb.jpg" width="450">
+<!--![image 3](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/embedded-systems/IMG_2316.jpg)-->
 
-![image 4](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/embedded-systems/Untitled%20Sketch_bb.jpg)
+<!--![image 4](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/embedded-systems/Untitled%20Sketch_bb.jpg)-->
 
 During May term of 2015, I created Proximity Infrared motion sensor box which could used to turn on household appliances when the user enters the room. The embedded system works by reading the input signal from the PIR sensor and when activated, the Arduino Micro activates a relay switch allowing a high current to flow to the external socket. This can run a variety of appliances, such as: a lamp, iHome speaker system, alarm, or whatever your heart desires, so long as the device draws under 30 amps.
 
