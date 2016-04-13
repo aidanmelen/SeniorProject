@@ -1,0 +1,294 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Two Column One Page Curriculum Vitae
+% LaTeX Template
+% Version 1.1 (24/1/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Alessandro (The CV Inn)
+%
+% IMPORTANT: THIS TEMPLATE NEEDS TO BE COMPILED WITH XeLaTeX
+%
+% This template uses several fonts not included with Windows/Linux by
+% default. If you get compilation errors saying a font is missing, find the line
+% on which the font is used and either change it to a font included with your
+% operating system or comment the line out to use the default font.
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[10pt]{article} % Font size - 10pt, 11pt or 12pt
+
+\usepackage[hmargin=1.25cm, vmargin=1.5cm]{geometry} % Document margins
+
+\usepackage{marvosym} % Required for symbols in the colored box
+\usepackage{ifsym} % Required for symbols in the colored box
+
+\usepackage[usenames,dvipsnames]{xcolor} % Allows the definition of hex colors
+
+% Fonts and tweaks for XeLaTeX
+\usepackage{fontspec,xltxtra,xunicode}
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont[Mapping=tex-text]{Hoefler Text} % Main document font
+\setsansfont[Scale=MatchLowercase,Mapping=tex-text]{Gill Sans} % Font for your name at the top
+%\setmonofont[Scale=MatchLowercase]{Andale Mono}
+
+% Colors for links, text and headings
+\usepackage{hyperref}
+\definecolor{linkcolor}{HTML}{506266} % Blue-gray color for links 
+\definecolor{shade}{HTML}{F5DD9D} % Peach color for the contact information box
+\definecolor{text1}{HTML}{2b2b2b} % Main document font color, off-black
+\definecolor{headings}{HTML}{000000} % Dark red color for headings
+% Other color palettes: shade=B9D7D9 and linkcolor=A40000; shade=D4D7FE and linkcolor=FF0080
+
+\hypersetup{colorlinks,breaklinks, urlcolor=linkcolor, linkcolor=linkcolor} % Set up links and colors
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+% Headers and footers can be added with the \lhead{} \rhead{} \lfoot{} \rfoot{} commands
+% Example footer:
+%\rfoot{\color{headings} {\sffamily Last update: \today}. Typeset with Xe\LaTeX}
+
+\renewcommand{\headrulewidth}{0pt} % Get rid of the default rule in the header
+
+\usepackage{titlesec} % Allows creating custom \section's
+
+% Format of the section titles
+\titleformat{\section}{\color{headings}
+\scshape\Large\raggedright\textbf}{}{}{}
+
+\titlespacing{\section}{}{}{} % Spacing around titles
+
+\begin{document}
+
+\color{text1} % Sets the default text color for the whole document to the color defined as 'text1'
+
+%----------------------------------------------------------------------------------------
+%	TITLE
+%----------------------------------------------------------------------------------------
+
+\par{\centering{\vspace{-2.5cm}\sffamily\Huge Aidan Melen}\\ % Your name
+
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}[t]{0.5\textwidth} % Start the left-hand side of the page
+\vspace{0pt} % Trick for alignment
+	
+%----------------------------------------------------------------------------------------
+%	WORK EXPERIENCE
+%----------------------------------------------------------------------------------------
+
+\section*{Work Experience} 
+
+%------------------------------------------------
+% WORK EXPERIENCE 1
+%------------------------------------------------
+
+{\raggedleft\textsc{May 2015 $-$ Present}\par}
+
+{\raggedright\large Software Engineering Internship} \newliine \newline
+\textit{\href{http://sampleminded.com//} {Sampleminded}}} \newline
+
+\normalsize{{Working on both the server and client for a variety of web applications which help laboratories optimize their workflow processes. Programmed, tested, and successfully deployed a $2$D barcode technology while working in a Scrum driven work \newline environment. \textit{$Java$, $Javascript$, $SCSS$, $SQL$, $Mercurial$} \newline \newline
+Programming python modules for infrastructure automation and monitoring. \textit{$Python$, Git} \newline 
+
+%------------------------------------------------
+% WORK EXPERIENCE 2
+%------------------------------------------------
+
+{\raggedleft\textsc{August 2014 $-$ October 2014\par}
+
+{\raggedright\large Developer of \textit{Drinking Lab}\\
+\textit{Entrepreneurship} \newline
+
+\normalsize{Developed \textit{Drinking Lab}, an iPhone app that provides users with precise blood alcohol content (BAC) measurements.} \newline
+
+%------------------------------------------------
+
+Programmed an algorithm that determines BAC levels by \\ analyzing a user's physical profile together with the number of alcoholic drinks consumed. \textit{Drinking Lab} actively alerts its user when they become dangerously intoxicated. \textit{$Objective$$-$$C$} \newline \newline
+
+%----------------------------------------------------------------------------------------
+%	Project Information
+%----------------------------------------------------------------------------------------
+
+\colorbox{shade}{\textcolor{text1}{
+\begin{tabular}{c|p{8.3cm}}
+\raisebox{-4pt}{} & Rating: \star \star \star \star \star \\ % Address
+\raisebox{-3pt}{} & Downloads: $947$ \\ % Phone number
+\raisebox{-3pt}{} & Hyperlinks to App Store on iTunes: \\ % Phone number
+\raisebox{-1pt}{} & \href{https://itunes.apple.com/us/app/drinking-lab-lite/id916412823} {
+Drinking Lab LITE} and % Drinking Lab LITE
+\href{https://itunes.apple.com/us/app/drinking-lab/id908388925} {Drinking Lab} % Drinking Lab
+\end{tabular} 
+}} \newline \newline
+
+%------------------------------------------------
+% WORK EXPERIENCE 3
+%------------------------------------------------
+
+{\raggedleft\textsc{Fall 2012 $-$ Spring 2012}\par}
+
+{\raggedright\large iOS Internship} \\
+\textit{\href{http://greenmountainsoftware.com/} {Green Mountain Software}}} \newline
+
+\normalsize{Designed and built my first iOS application. Experienced \\ working alongside passionate and intelligent iOS developers in a professional setting.} 
+%----------------------------------------------------------------------------------------
+%	LEADERSHIP
+%----------------------------------------------------------------------------------------
+
+\section*{Leadership} 
+
+%------------------------------------------------
+% LEADERSHIP 1
+%------------------------------------------------
+
+{\raggedleft\textsc{September 2014 -- Present}\par}
+
+{\raggedright\large Computer Science Tutor\\
+\textit{Westminster College}\\[5pt]}
+
+Encourage valuable \href{https://github.com/aidanmelen/Westminster_tutoring/blob/master/hangman/hangman.java} {programming practices}, such as: object$-$oriented programming, debugging, and program readability.  Develop strong problem solving and communication skills. \\
+
+%------------------------------------------------
+% LEADERSHIP 2
+%------------------------------------------------
+
+{\raggedleft\textsc{September 2014 -- May 2015}\par}
+
+{\raggedright\large Treasurer / Instructor of Clay Club \\
+\textit{Westminster College}\\[5pt]}
+
+\normalsize{Fundraised by selling my pottery at a Clay Club sale. Instructed valuable pottery techniques to Westminster students.} \\
+
+\end{minipage} % End the left-hand side of the page
+\hfill
+\begin{minipage}[t]{0.44\textwidth} % Start the right-hand side of the page
+\vspace{0pt} % Trick for alignment
+
+%----------------------------------------------------------------------------------------
+%	COLORED BOX
+%----------------------------------------------------------------------------------------
+
+\colorbox{shade}{\textcolor{text1}{
+\begin{tabular}{c|p{7cm}}
+\raisebox{-4pt} & \href{https://www.google.com/maps/place/1662+S+1200+E,+Salt+Lake+City,+UT+84105/@40.734181,-111.856948,17z/data=!3m1!4b1!4m2!3m1!1s0x87528aa9df49f1d3:0x5ad37508482c2efd}
+{1662 S 1200 E, SLC, UT, 84105} \\ % Address
+\raisebox{-3pt} & \href{tel:802-598-2135} {$802$-$598$-$2135$}\\ % Phone number
+\raisebox{-1pt} & \href{mailto:aidan.melen94@gmail.com} {aidan.melen$94$@gmail.com}\\ % Email address
+\end{tabular} \newline
+}
+}
+
+%----------------------------------------------------------------------------------------
+%	EDUCATION
+%----------------------------------------------------------------------------------------
+
+\section*{Education} 
+
+\begin{tabular}{rl} % Start a table with two columns, one for dates and one for qualifications
+
+\raggedleft\textsc{2012 -- expected 2016} & \textbf{B.S. Computer Science} \\ 
+& \textbf{Art Minor} \\
+& \textit{Westminster College}\\
+& \textbl{GPA $3.52$} 
+\end{tabular} \newline
+
+%----------------------------------------------------------------------------------------
+%	RELEVANT COURSE EXPERIENCE
+%----------------------------------------------------------------------------------------
+
+\section*{Relevant Course Experience} 
+
+\begin{tabular}{rl}
+Artificial Intelligence 
+& Software Engineering \\
+Algorithms 
+& Intro to Data Structures \\
+Database Systems 
+& Computer Systems \\
+Computer Architecture 
+& iOS App Development \\
+Computer Graphics 
+& Embedded Systems \\
+Operating Systems
+& Computer Networks \\
+Discrete Mathematics 
+& Calculus \\
+\end{tabular} \newline
+
+%----------------------------------------------------------------------------------------
+%	PROGRAMMING SKILLS
+%----------------------------------------------------------------------------------------
+
+\section*{Programming Skills} 
+
+\begin{tabular}{rl}
+Basic Knowledge 
+& HTML, CSS, Javascript, \textsc{C},\\
+& \textsc{Objective$-$C}, Postgres\\ 
+& \\
+Proficient Knowledge
+& Java, Python, Unix, Git, \\
+&  \LaTeX 
+\end{tabular} \newline
+
+%----------------------------------------------------------------------------------------
+%	AWARDS
+%----------------------------------------------------------------------------------------
+
+\section*{Awards} 
+
+\begin{tabular}{rl}
+
+2014 $-$ 2015 & {\href{https://www.linkedin.com/pulse/drinking-lab-ranks-top-25-student-founded-business-utah-aidan-melen?trk=prof-post} {Ranked as top 25 student$-$founded} \\
+& {\href{https://www.linkedin.com/pulse/drinking-lab-ranks-top-25-student-founded-business-utah-aidan-melen?trk=prof-post} {business in Utah} \\
+& \textit{The Utah Student 25} \\ \\
+
+%------------------------------------------------
+
+2014 $-$ 2016 & \textbf{Math and Science Endowed Scholarship} \\
+& \textit{Dr. Bruce Bemis } \\ \\
+
+%------------------------------------------------
+
+2014 $-$ 2016	 & \textbf{Dean's List}\\
+& \textit{Westminster College}
+\end{tabular} \newline
+
+%----------------------------------------------------------------------------------------
+%	TEAM WORK
+%----------------------------------------------------------------------------------------
+
+\section*{Team Work} 
+
+Worked in a group of four for a semester$-$long software engineering project in order to develop a deliverable website. \textit{$Django$, $Git$, $HTML$, $CSS$, $Java Script$, $SQL$} \newline
+
+
+%----------------------------------------------------------------------------------------
+%	ATHELETICS
+%----------------------------------------------------------------------------------------
+
+\section*{Athletics} 
+
+\begin{tabular}{rl}
+2015 & \textbf{USCSA Men's Team National Champions}\\
+& \textit{Westminster Snowboard Team} \\ \\
+
+%------------------------------------------------
+
+2013	 & \textbf{4\textsuperscript{th}  place finish at World University Games}\\
+& \textit{United States Snowboard Team} \\ \\
+\end{tabular}
+
+
+%----------------------------------------------------------------------------------------
+	
+\end{minipage} % End right-hand side of the page
+
+\end{document}  
