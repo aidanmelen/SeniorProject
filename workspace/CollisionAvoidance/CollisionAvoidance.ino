@@ -5,7 +5,7 @@
  * This program has three major roles:
  * first, reading RC signals from the receiver and forwarding them to the flight controller.
  * second, get distance measurements from all four ultrasonic sensors and determine the closest measurement if any.
- * third, if the closest measurement is within the acceptable threshold, instruct flight controller to perform movement in opposite direction of trigged sensor.
+ * third, if the closest measurement is within the target range, instruct the flight controller to preform a maneuver in the opposite direction of trigged sensor.
  */
 
 #include <NewPing.h>
