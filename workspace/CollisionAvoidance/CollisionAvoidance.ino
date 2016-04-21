@@ -13,11 +13,11 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // Configuration variables
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 50
-#define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 150
+#define OUTER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 200
+#define INNER_DISTANCE_THRESHOLD_FOR_SENSORS_IN_CM 50
 #define NUMBER_OF_SONAR_BURSTS 10
 #define MAX_AUTOPILOT_MOVEMENT 200
-#define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 500
+#define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 300
 
 boolean const preformMarkovAvoidance = false;
 boolean const serialMonitorIsOpen = false;
@@ -68,9 +68,9 @@ NewPing sensorArray[] = {p1, p2, p3, p4};
 // Setup Pins for RC i/o and utrasonic sensor inputs
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void setup() {
-  //  if (serialMonitorIsOpen == true) {
-  Serial.begin(115200);
-  //  }
+  if (serialMonitorIsOpen == true) {
+    Serial.begin(115200);
+  }
   pinMode(throttleIn, INPUT);
   pinMode(rollIn, INPUT);
   pinMode(pitchIn, INPUT);
@@ -202,15 +202,10 @@ void forwardRCSignalsToFlightController() {
 int runAutoPilot() {
   int incomingCollisionDirecton = -1;
   while (true) {
-
-    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
-    // check sensors for triggering distances
+//    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
     incomingCollisionDirecton = getClosestDirection();
-    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
-
-    // a sensor was triggered by closest()
+//    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
     if (incomingCollisionDirecton != -1) {
-
       if (preformMarkovAvoidance) {
         int markovDirection = getMarkovCollisionAvoidance(incomingCollisionDirecton);
         forwardCollisionAvoidanceManeuverToFlightController(markovDirection);  
@@ -218,9 +213,7 @@ int runAutoPilot() {
         forwardCollisionAvoidanceManeuverToFlightController((incomingCollisionDirecton + 2) % 4); // avoid collision with movement in opposite direction
       }
     }
-
     if (!isAutoPilotMode()) break;
-
   } // end of while
 
 }
@@ -234,40 +227,30 @@ int getClosestDirection() {
   int incomingCollisionDirecton = -1;
 
   for (int sensorIndex = 0; sensorIndex <= 3; sensorIndex++)  {
-
-    // get distance measurement quickly with one ping
-    initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM;
-
-    // print out distance measurement
+    initialDistanceMeasurement = sensorArray[sensorIndex].ping() / US_ROUNDTRIP_CM; // get distance measurement quickly with one ping
+//    if (!serialMonitorIsOpen)forwardRCSignalsToFlightController();
+    if (!isAutoPilotMode()) break;
     if (serialMonitorIsOpen) printSonarMeasurementsToConsole(sensorIndex, initialDistanceMeasurement);
 
     // check and exit if triggered
     if (distanceMeasurementIsWithinRange(initialDistanceMeasurement)) {
 
-      if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
+//      if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
       if (!isAutoPilotMode()) break;
-
-      if (!serialMonitorIsOpen)forwardRCSignalsToFlightController();
-      // double check with with multiple pings
-      finalDistanceMeasurement = sensorArray[sensorIndex].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM;
+      finalDistanceMeasurement = sensorArray[sensorIndex].ping_median(NUMBER_OF_SONAR_BURSTS) / US_ROUNDTRIP_CM; // double check with with multiple pings
+//      if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
       if (!isAutoPilotMode()) break;
-      if (!serialMonitorIsOpen)forwardRCSignalsToFlightController();
-
+      
       // if it passes, it was not a false-positive measurement.
       // proceed to mark the direction as triggered.
       if (distanceMeasurementIsWithinRange(finalDistanceMeasurement)) {
         incomingCollisionDirecton = sensorIndex;
         break;
-
-      }  // end final check
-    } // end initial check
-
+      }
+    }
     if (!isAutoPilotMode()) break;
-
-  } // end of for
-
+  }
   if (serialMonitorIsOpen) Serial.println();
-
   return incomingCollisionDirecton;
 }
 

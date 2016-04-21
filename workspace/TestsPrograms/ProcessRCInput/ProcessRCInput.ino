@@ -34,32 +34,32 @@ void loop() {
   ch5 = pulseIn(6, HIGH, 25000);
 //  ch6 = pulseIn(7, HIGH, 25000);
    
-//  analogWrite(8, map(ch1,0,2000,0,255));
-//  analogWrite(9, map(ch2,0,2000,0,255));
-//  analogWrite(10, map(ch3,0,2000,0,255));
-//  analogWrite(11, map(ch4,0,2000,0,255));
-//  analogWrite(12, map(ch5,0,2000,0,255));
+  analogWrite(8, map(ch1,0,2000,0,255));
+  analogWrite(9, map(ch2,0,2000,0,255));
+  analogWrite(10, map(ch3,0,2000,0,255));
+  analogWrite(11, map(ch4,0,2000,0,255));
+  analogWrite(12, map(ch5,0,2000,0,255));
 //  analogWrite(13, map(ch6,0,2000,0,500));
+  
+//  Serial.print("Channel 1: ");
+//  Serial.print(ch1);
+//  Serial.print(" | ");
+//
+//  Serial.print("Channel 2:");
+//  Serial.print(ch2);
+//  Serial.print(" | ");
 //  
-  Serial.print("Channel 1: ");
-  Serial.print(ch1);
-  Serial.print(" | ");
-
-  Serial.print("Channel 2:");
-  Serial.print(ch2);
-  Serial.print(" | ");
-  
-  Serial.print("Channel 3:");
-  Serial.print(ch3);
-  Serial.print(" | ");
-  
-  Serial.print("Channel 4:");
-  Serial.print(ch4);
-  Serial.print(" | ");
-  
-  Serial.print("Aux 1: ");
-  Serial.print(ch5);
-  Serial.println();
+//  Serial.print("Channel 3:");
+//  Serial.print(ch3);
+//  Serial.print(" | ");
+//  
+//  Serial.print("Channel 4:");
+//  Serial.print(ch4);
+//  Serial.print(" | ");
+//  
+//  Serial.print("Aux 1: ");
+//  Serial.print(ch5);
+//  Serial.println();
 //  
 //  Serial.print("Aux 2: ");
 //  Serial.println(ch6);
