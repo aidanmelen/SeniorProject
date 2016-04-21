@@ -66,7 +66,7 @@ Reading the wonderful feedback from these satisfied users has been one of the mo
 
 During Computer Network of Fall of 2016, we explored socket programming with Java. During this time, I was able to write a xml configurable, multi-threaded web server. Although the the front-end seems rather elementary, the backend is advanced. For instance, the web server is capable of resource caching, it can handle 404 (page not found) and 400 (bad request) errors as well as do server side logging of all the GET request traffic. 
 
-By programming with sockets, we were forced to read streams of HTTP request, parsing for the requested resource, and generating a proper response with the resource that was request. It was a challenging assignment which required many debugging methods. For instance, I could not simply test a 400 error with a browser, instead I need to use telnet in order to send a faulty GET request in order to see the response. All in all, this assignment really helped me understand the application layer of the network hierarchy.
+By programming with sockets, we were forced to read streams of HTTP request, parsing for the requested resource, and generating a proper response with the resource that was request. It was a challenging assignment which required many debugging methods. For instance, I could not simply test a 400 error with a browser, instead I needed to use telnet in order to send a faulty GET request. All in all, this assignment really helped me understand the application layer of the network hierarchy and socket programming in Java.
 
 
 ## Artificial Intelligence - Sudoku Solver
