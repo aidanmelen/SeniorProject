@@ -49,12 +49,14 @@ With the knowledge gained from a mobile software development course at Westminst
 
 Currently, Drinking Lab has received a five-star rating on Apple’s App Store, has acquired over 1000 downloads from twenty-four countries worldwide. I have also received many positive reviews; for example, these users shared:
 
-| User          | rating        | comment  |
+| User          | Rating        | Comment  |
 | ------------- |:-------------:| :--------|
 | Rel_horowitz | \*\*\*\*\* | Drinking lab is excellent! I've used many other BAC calculators and this one is by far the most accurate! This app is a must for anyone that drinks! |
 | gcubed | \*\*\*\*\*   | Really nice app that informs people and helps drink responsibly. Especially useful for college campuses and students” |
 | Ed_hanson | \*\*\*\*\* | This app is very well done and super informative. I like the intuitive layout and plan on using it tonight. Love it |
 | j_trees | \*\*\*\*\* | Best app on the market! |
+
+**Downloads Statistics From The App Store:**
 
 ![image 8](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/ios-development/Screen%20Shot%202016-04-11%20at%209.16.41%20PM.png)
 
