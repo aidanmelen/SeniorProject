@@ -31,7 +31,7 @@ This project helped me explore and learn how to program Arduino Microcontrollers
 ## Software Engineering - Django Web Server
 * [Code On GitHub](https://github.com/TheBigTeam/hamath-workspace)
 
-![image 5](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/software-engineering/Screen%20Shot%202016-04-11%20at%209.32.39%20PM.png)
+![image 5](https://github.com/aidanmelen/SeniorProject/blob/master/resources/portfolio/software-engineering/GamePlay.png)
 
 Software Engineering gave me the opportunity to continue growing my python skill set while learning the Django web-framework. Before this Spring of 2016, I had very little experience working on a web application. During the semester, I was responsible for creating the DOM for all the pages, server-side programming such as hooking urls to views, creating a Postgresql database and integrating it with django's forms and models, a Python Emailer allows teachers to apply for Teacher credentials on signup, css styling, and lastly, setting up and managing the GitHub remote repository.
 
