@@ -19,4 +19,4 @@ git pull origin master
 
 ## Contact
 
-alm0415@westminstercollege.edu
+aidan.melen94@gmail.com
