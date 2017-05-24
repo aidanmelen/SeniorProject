@@ -19,7 +19,7 @@
 #define MAX_AUTOPILOT_MOVEMENT 200
 #define AUTOPILOT_MOVEMENT_DURATION_IN_MILLI 300
 
-boolean const preformMarkovAvoidance = false;
+boolean const performMarkovAvoidance = false;
 boolean const serialMonitorIsOpen = false;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -206,7 +206,7 @@ int runAutoPilot() {
     incomingCollisionDirecton = getClosestDirection();
 //    if (!serialMonitorIsOpen) forwardRCSignalsToFlightController();
     if (incomingCollisionDirecton != -1) {
-      if (preformMarkovAvoidance) {
+      if (performMarkovAvoidance) {
         int markovDirection = getMarkovCollisionAvoidance(incomingCollisionDirecton);
         forwardCollisionAvoidanceManeuverToFlightController(markovDirection);  
       } else {
